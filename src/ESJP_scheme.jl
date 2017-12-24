@@ -62,10 +62,12 @@ function compute_Dfluxes!(hh, Flux, DiffMat, u, mesh, dt, M, alg::FVESJPeAlgorit
     dx = mesh.Δx
     #update vector
     Threads.@threads for j in edge_indices(mesh)
-        @inbounds vl = ve(cellval_at_left(j,u,mesh))
-        @inbounds vr = ve(cellval_at_right(j,u,mesh))
+        @inbounds ul = cellval_at_left(j,u,mesh)
+        @inbounds ur = cellval_at_right(j,u,mesh)
+        vl = ve(ul); vr = ve(ur)
+        α = max.(abs.(Flux(ul)), abs.(Flux(ur)))
         hh[j,:] = Nflux(vl, vr) -
-        1/dx*(Ndiff(vl, vr)*(vr-vl)+ ϵ*(vr-vl))
+        1/dx*(Ndiff(vl, vr)*(vr-vl) + ϵ*α.*(vr-vl))
     end
 end
 
