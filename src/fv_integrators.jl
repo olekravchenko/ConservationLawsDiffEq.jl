@@ -47,11 +47,11 @@ function (fv::FVIntegrator)(du::AbstractArray{T,2}, u::AbstractArray{T,2}, p, t)
   mesh = fv.mesh; alg = fv.alg; Flux = fv.Flux; M = fv.M;
   fluxes = fv.fluxes; dt = fv.dt; use_threads = fv.use_threads
   compute_fluxes!(fluxes, Flux, u, mesh, dt, M, alg, Val{use_threads})
-  if isleftzeroflux(mesh);fluxes[1,:] = zero(T); end
-  if isrightzeroflux(mesh);fluxes[numedges(mesh),:] = zero(T);end
+  if isleftzeroflux(mesh);fluxes[1,:] .= zero(T); end
+  if isrightzeroflux(mesh);fluxes[numedges(mesh),:] .= zero(T);end
   compute_du!(du, fluxes, mesh, Val{use_threads})
-  if isleftdirichlet(mesh);du[1,:] = zero(T); end
-  if isrightdirichlet(mesh);fluxes[numcells(mesh),:] = zero(T);end
+  if isleftdirichlet(mesh);du[1,:] .= zero(T); end
+  if isrightdirichlet(mesh);fluxes[numcells(mesh),:] .= zero(T);end
   nothing
 end
 
@@ -71,11 +71,11 @@ function (fv::FVDiffIntegrator)(du::AbstractArray{T,2}, u::AbstractArray{T,2}, p
   mesh = fv.mesh; alg = fv.alg; Flux = fv.Flux; M = fv.M
   fluxes = fv.fluxes; DiffMat = fv.DiffMat; dt = fv.dt; use_threads = fv.use_threads
   compute_Dfluxes!(fluxes, Flux, DiffMat, u, mesh, dt, M, alg, Val{use_threads})
-  if isleftzeroflux(mesh);fluxes[1,:] = zero(T); end
-  if isrightzeroflux(mesh);fluxes[numedges(mesh),:] = zero(T);end
+  if isleftzeroflux(mesh);fluxes[1,:] .= zero(T); end
+  if isrightzeroflux(mesh);fluxes[numedges(mesh),:] .= zero(T);end
   compute_du!(du, fluxes, mesh, Val{use_threads})
-  if isleftdirichlet(mesh);du[1,:] = zero(T); end
-  if isrightdirichlet(mesh);fluxes[numcells(mesh),:] = zero(T);end
+  if isleftdirichlet(mesh);du[1,:] .= zero(T); end
+  if isrightdirichlet(mesh);fluxes[numcells(mesh),:] .= zero(T);end
   nothing
 end
 
@@ -84,7 +84,7 @@ function compute_du!(du, fluxes, mesh::AbstractFVMesh1D, ::Type{Val{true}})
     Threads.@threads for cell in cell_indices(mesh)
         @inbounds left = left_edge(cell, mesh)
         @inbounds right = right_edge(cell, mesh)
-        @inbounds du[cell,:] = -( fluxes[right,:] - fluxes[left,:] ) / cell_volume(cell, mesh)
+        @inbounds du[cell,:] .= -( fluxes[right,:] - fluxes[left,:] ) / cell_volume(cell, mesh)
     end
 end
 
@@ -92,6 +92,6 @@ function compute_du!(du, fluxes, mesh::AbstractFVMesh1D, ::Type{Val{false}})
     for cell in cell_indices(mesh)
         @inbounds left = left_edge(cell, mesh)
         @inbounds right = right_edge(cell, mesh)
-        @inbounds du[cell,:] = -( fluxes[right,:] - fluxes[left,:] ) / cell_volume(cell, mesh)
+        @inbounds du[cell,:] .= -( fluxes[right,:] - fluxes[left,:] ) / cell_volume(cell, mesh)
     end
 end

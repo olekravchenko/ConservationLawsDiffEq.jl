@@ -19,7 +19,7 @@ function inner_loop!(hh,j,u,∇u,mesh,Flux, alg::FVSKTAlgorithm)
     @inbounds ur = cellval_at_right(j,u,mesh)
     aa = max(fluxρ(uminus,Flux),fluxρ(uplus,Flux))
     # Numerical Fluxes
-    @inbounds hh[j,:] = 0.5*(Flux(uplus)+Flux(uminus)) - aa/2*(uplus - uminus)
+    @inbounds hh[j,:] .= 0.5*(Flux(uplus)+Flux(uminus)) - aa/2*(uplus - uminus)
 end
 
 """
@@ -56,7 +56,7 @@ function inner_loop!(hh,j,u,∇u,mesh,Flux, DiffMat, alg::FVSKTAlgorithm)
     @inbounds ur = cellval_at_right(j,u,mesh)
     aa = max(fluxρ(uminus,Flux),fluxρ(uplus,Flux))
     # Numerical Fluxes
-    @inbounds hh[j,:] = 0.5*(Flux(uplus)+Flux(uminus)) - aa/2*(uplus - uminus) - 0.5*(DiffMat(ur)+DiffMat(ul))*cellval_at_left(j,∇u,mesh)/mesh.Δx
+    @inbounds hh[j,:] .= 0.5*(Flux(uplus)+Flux(uminus)) - aa/2*(uplus - uminus) - 0.5*(DiffMat(ur)+DiffMat(ul))*cellval_at_left(j,∇u,mesh)/mesh.Δx
 end
 
 function compute_Dfluxes!(hh, Flux, DiffMat, u, mesh, dt, M, alg::FVSKTAlgorithm, ::Type{Val{true}})

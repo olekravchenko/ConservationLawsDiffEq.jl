@@ -1,6 +1,5 @@
 # 1D Burgers Equation
 # u_t+(0.5*u²)_{x}=0
-
 using ConservationLawsDiffEq
 
 const CFL = 0.5
@@ -17,8 +16,8 @@ end
 #Compile
 prob = get_problem(10)
 #Run
-prob = get_problem(200)
-@time sol = solve(prob, FVSKTAlgorithm();progress=true, use_threads = true, save_everystep = false)
+@time prob = get_problem(200)
+@time sol = solve(prob, FVSKTAlgorithm();progress=true, use_threads = false, save_everystep = false)
 @time sol1 = fast_solve(prob, FVSKTAlgorithm();progress=true)
 @time sol2 = solve(prob, LaxFriedrichsAlgorithm();progress=true, save_everystep = false)
 @time sol3 = solve(prob, LocalLaxFriedrichsAlgorithm();progress=true, save_everystep = false)
